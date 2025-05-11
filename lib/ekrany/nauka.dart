@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fischer/services/firebase_service.dart';
 
 class Nauka extends StatefulWidget {
   @override
@@ -9,12 +11,12 @@ class Nauka extends StatefulWidget {
 class _NaukaState extends State<Nauka> with SingleTickerProviderStateMixin {
   bool isFlipped = false;
   int currentIndex = 0;
+  bool isLoading = true;
+  String errorMessage = '';
 
-  final List<Map<String, String>> fiszki = [
-    {'pl': 'Kot', 'en': 'Cat'},
-    {'pl': 'Pies', 'en': 'Dog'},
-    {'pl': 'Dom', 'en': 'House'},
-  ];
+  // Lista fiszek z Firebase
+  List<Map<String, dynamic>> fiszki = [];
+  final FirebaseService _firebaseService = FirebaseService();
 
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -31,6 +33,44 @@ class _NaukaState extends State<Nauka> with SingleTickerProviderStateMixin {
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
+
+    // Pobierz fiszki z Firebase
+    _loadFiszki();
+  }
+
+  // Funkcja do ładowania fiszek z Firebase
+  void _loadFiszki() {
+    _firebaseService.getFiszki().listen((data) {
+      if (mounted) {
+        setState(() {
+          fiszki = data;
+          isLoading = false;
+          errorMessage = '';
+
+          // Jeśli nie ma fiszek, ustaw domyślne
+          if (fiszki.isEmpty) {
+            fiszki = [
+              {'pl': 'Kot', 'en': 'Cat', 'id': '1'},
+              {'pl': 'Pies', 'en': 'Dog', 'id': '2'},
+              {'pl': 'Dom', 'en': 'House', 'id': '3'},
+            ];
+          }
+        });
+      }
+    }, onError: (error) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Błąd ładowania fiszek: $error';
+          // Ustaw domyślne fiszki w przypadku błędu
+          fiszki = [
+            {'pl': 'Kot', 'en': 'Cat', 'id': '1'},
+            {'pl': 'Pies', 'en': 'Dog', 'id': '2'},
+            {'pl': 'Dom', 'en': 'House', 'id': '3'},
+          ];
+        });
+      }
+    });
   }
 
   void flipCard() {
@@ -45,6 +85,8 @@ class _NaukaState extends State<Nauka> with SingleTickerProviderStateMixin {
   }
 
   void nextCard() {
+    if (fiszki.isEmpty) return;
+
     setState(() {
       currentIndex = (currentIndex + 1) % fiszki.length;
       isFlipped = false;
@@ -65,8 +107,53 @@ class _NaukaState extends State<Nauka> with SingleTickerProviderStateMixin {
     final double cardWidth = screenWidth > 1100 ? 1000 : screenWidth * 0.9;
     final double cardHeight = screenHeight > 600 ? 400 : screenHeight * 0.5;
 
-    final String tekstPl = fiszki[currentIndex]['pl']!;
-    final String tekstEn = fiszki[currentIndex]['en']!;
+    // Pokaż ładowanie jeśli dane są pobierane
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFCCF5FC),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Ładowanie fiszek...'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Pokaż komunikat o błędzie jeśli wystąpił
+    if (errorMessage.isNotEmpty) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFCCF5FC),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Colors.red),
+              SizedBox(height: 16),
+              Text(errorMessage),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isLoading = true;
+                    errorMessage = '';
+                  });
+                  _loadFiszki();
+                },
+                child: Text('Spróbuj ponownie'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final String tekstPl = fiszki.isEmpty ? 'Brak fiszek' : fiszki[currentIndex]['pl'] ?? 'Brak tekstu';
+    final String tekstEn = fiszki.isEmpty ? 'No flashcards' : fiszki[currentIndex]['en'] ?? 'No text';
 
     return Scaffold(
       backgroundColor: const Color(0xFFCCF5FC),
@@ -111,6 +198,18 @@ class _NaukaState extends State<Nauka> with SingleTickerProviderStateMixin {
                         fit: BoxFit.contain,
                       ),
                     ],
+                  ),
+                ),
+
+                // Informacja o liczbie fiszek
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Text(
+                    'Fiszka ${currentIndex + 1} z ${fiszki.length}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
 

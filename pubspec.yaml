@@ -14,6 +14,11 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.15.0  # Jeśli potrzebujesz uwierzytelniania
+  cloud_firestore: ^4.13.3  # Jeśli potrzebujesz bazy danych
+  firebase_storage: ^11.5.3  # Jeśli potrzebujesz przechowywania plików
+  firebase_analytics: ^10.7.2  # Jeśli potrzebujesz analityki
 
 dev_dependencies:
   flutter_test:

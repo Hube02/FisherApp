@@ -3,13 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:fischer/ekrany/glowny.dart';
 import 'package:fischer/ekrany/powitalny.dart';
 import 'package:fischer/ekrany/test.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  // Inicjalizacja Flutter i Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp();
+    print('Firebase zainicjalizowany pomyślnie');
+  } catch (e) {
+    print('Błąd inicjalizacji Firebase: $e');
+  }
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Fischer App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
       initialRoute: '/powitalny',
       routes: {
         '/powitalny': (context) => Powitalny(),

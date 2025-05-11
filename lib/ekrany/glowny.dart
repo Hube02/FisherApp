@@ -1,7 +1,11 @@
 import 'package:fischer/ekrany/test.dart';
 import 'package:flutter/material.dart';
+import 'package:fischer/services/firebase_service.dart';
 
 class Glowny extends StatelessWidget {
+  // Instancja Firebase Service
+  final FirebaseService _firebaseService = FirebaseService();
+
   Widget _buildTile(String title, String subtitle, Color color) {
     return Container(
       decoration: BoxDecoration(
@@ -28,53 +32,85 @@ class Glowny extends StatelessWidget {
   void showAddFlashcardDialog(BuildContext context) {
     final TextEditingController plController = TextEditingController();
     final TextEditingController enController = TextEditingController();
+    bool isLoading = false;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('Dodaj nową fiszkę'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: plController,
-                decoration: InputDecoration(
-                  labelText: 'Tekst po polsku',
-                  border: OutlineInputBorder(),
+        return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                title: Text('Dodaj nową fiszkę'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: plController,
+                      decoration: InputDecoration(
+                        labelText: 'Tekst po polsku',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: enController,
+                      decoration: InputDecoration(
+                        labelText: 'Tekst po angielsku',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(height: 16),
-              TextField(
-                controller: enController,
-                decoration: InputDecoration(
-                  labelText: 'Tekst po angielsku',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // zamyka okno
-              },
-              child: Text('Anuluj'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final pl = plController.text.trim();
-                final en = enController.text.trim();
-                if (pl.isNotEmpty && en.isNotEmpty) {
-                  print('Dodano fiszkę: $pl → $en');
-                  Navigator.pop(context);
-                }
-              },
-              child: Text('Dodaj'),
-            ),
-          ],
+                actions: [
+                  TextButton(
+                    onPressed: isLoading
+                        ? null
+                        : () {
+                      Navigator.pop(context); // zamyka okno
+                    },
+                    child: Text('Anuluj'),
+                  ),
+                  ElevatedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                      final pl = plController.text.trim();
+                      final en = enController.text.trim();
+                      if (pl.isNotEmpty && en.isNotEmpty) {
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          // Dodanie fiszki do Firebase
+                          await _firebaseService.dodajFiszke(pl, en);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Fiszka dodana pomyślnie!'))
+                          );
+                          Navigator.pop(context);
+                        } catch (e) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Błąd: $e'))
+                          );
+                        }
+                      }
+                    },
+                    child: isLoading
+                        ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2)
+                    )
+                        : Text('Dodaj'),
+                  ),
+                ],
+              );
+            }
         );
       },
     );
@@ -181,7 +217,9 @@ class Glowny extends StatelessWidget {
                         width: tileWidth,
                         height: tileHeight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Tutaj możesz dodać nawigację do ekranu statystyk
+                          },
                           child: _buildTile(
                             "Statystyki",
                             "Zobacz jak robisz postępy",
