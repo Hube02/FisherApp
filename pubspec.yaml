@@ -1,52 +1,28 @@
 name: fischer
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
+description: A new Flutter project.
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.2
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.8
   firebase_core: ^2.24.0
-  firebase_auth: ^4.15.0  # Jeśli potrzebujesz uwierzytelniania
-  cloud_firestore: ^4.13.3  # Jeśli potrzebujesz bazy danych
-  firebase_storage: ^11.5.3  # Jeśli potrzebujesz przechowywania plików
-  firebase_analytics: ^10.7.2  # Jeśli potrzebujesz analityki
+  firebase_auth: ^4.15.0
+  cloud_firestore: ^4.13.3
+  firebase_storage: ^11.5.3
+  firebase_analytics: ^10.7.2
+  # No shared_preferences
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
-  flutter_lints: ^5.0.0
-
+  flutter_lints: ^3.0.0
 
 flutter:
-
   uses-material-design: true
-
-
   assets:
     - images/
-
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package

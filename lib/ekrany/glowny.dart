@@ -116,8 +116,30 @@ class Glowny extends StatelessWidget {
     );
   }
 
+  // Metoda wylogowywania
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await _firebaseService.signOut();
+      Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/powitalny',
+              (route) => false
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Błąd podczas wylogowywania: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Sprawdź czy użytkownik jest zalogowany
+    final bool isUserLoggedIn = _firebaseService.isUserLoggedIn;
+    final String userEmail = isUserLoggedIn
+        ? _firebaseService.currentUserEmail ?? 'użytkownik'
+        : '';
+
     return Scaffold(
       body: LayoutBuilder(builder: (context, constraints) {
         final screenHeight = constraints.maxHeight;
@@ -129,7 +151,7 @@ class Glowny extends StatelessWidget {
         // Dostępna wysokość na kafelki
         final gridHeight = screenHeight - headerHeight;
 
-        // Ustalmy proporcje, żeby się ładnie zmieściło i nie było zbyt małe
+        // Proporcje ekranu
         final tileWidth = (screenWidth - 80) / 2; // 80 = padding + spacing
         final tileHeight = (gridHeight - 40) / 2; // 40 = spacing
 
@@ -147,18 +169,29 @@ class Glowny extends StatelessWidget {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Witaj w panelu głównym!',
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Text(
+                      isUserLoggedIn
+                          ? 'Witaj, $userEmail!'
+                          : 'Witaj w panelu głównym!',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   Image.asset('images/logoFischer.jpg', height: 50),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/powitalny');
-                    },
-                    child: Text('Wyloguj'),
+                  TextButton.icon(
+                    icon: Icon(Icons.exit_to_app),
+                    label: Text(isUserLoggedIn ? 'Wyloguj' : 'Wróć'),
+                    onPressed: () => _signOut(context),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red.withOpacity(0.1),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -218,7 +251,7 @@ class Glowny extends StatelessWidget {
                         height: tileHeight,
                         child: TextButton(
                           onPressed: () {
-                            // Tutaj możesz dodać nawigację do ekranu statystyk
+                            // Tutaj trzeba będzie dodać nawigację do ekranu statystyk
                           },
                           child: _buildTile(
                             "Statystyki",

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:fischer/services/firebase_service.dart';
 
 class Test extends StatefulWidget {
   @override
@@ -13,12 +14,11 @@ class _TestState extends State<Test> with SingleTickerProviderStateMixin {
   final List<Icon> resultsIcons = [];
   int correct = 0;
   int incorrect = 0;
+  bool isLoading = true;
+  String errorMessage = '';
 
-  final List<Map<String, String>> fiszki = [
-    {'pl': 'Kot', 'en': 'Cat'},
-    {'pl': 'Pies', 'en': 'Dog'},
-    {'pl': 'Dom', 'en': 'House'},
-  ];
+  List<Map<String, dynamic>> fiszki = [];
+  final FirebaseService _firebaseService = FirebaseService();
 
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -36,9 +36,48 @@ class _TestState extends State<Test> with SingleTickerProviderStateMixin {
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
+
+    _loadFiszki();
+  }
+
+  // Funkcja do ładowania fiszek z Firebase
+  void _loadFiszki() {
+    _firebaseService.getFiszki().listen((data) {
+      if (mounted) {
+        setState(() {
+          fiszki = data;
+          isLoading = false;
+          errorMessage = '';
+
+          // Jeśli nie ma fiszek, ustaw domyślne
+          if (fiszki.isEmpty) {
+            fiszki = [
+              {'pl': 'Kot', 'en': 'Cat', 'id': '1'},
+              {'pl': 'Pies', 'en': 'Dog', 'id': '2'},
+              {'pl': 'Dom', 'en': 'House', 'id': '3'},
+            ];
+          }
+        });
+      }
+    }, onError: (error) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Błąd ładowania fiszek: $error';
+          // Ustaw domyślne fiszki w przypadku błędu
+          fiszki = [
+            {'pl': 'Kot', 'en': 'Cat', 'id': '1'},
+            {'pl': 'Pies', 'en': 'Dog', 'id': '2'},
+            {'pl': 'Dom', 'en': 'House', 'id': '3'},
+          ];
+        });
+      }
+    });
   }
 
   void flipAndCheck() {
+    if (fiszki.isEmpty) return;
+
     String correctAnswer = fiszki[currentIndex]['en']!.toLowerCase().trim();
     String user = userAnswer.toLowerCase().trim();
 
@@ -63,8 +102,11 @@ class _TestState extends State<Test> with SingleTickerProviderStateMixin {
   }
 
   void nextCard() {
+    if (fiszki.isEmpty) return;
+
     if (currentIndex + 1 >= fiszki.length) {
       // Koniec testu
+      _saveTestResults();
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -93,6 +135,15 @@ class _TestState extends State<Test> with SingleTickerProviderStateMixin {
     }
   }
 
+  // Zapisz wyniki testu
+  Future<void> _saveTestResults() async {
+    try {
+      await _firebaseService.zapiszWynikTestu(correct, correct + incorrect);
+    } catch (e) {
+      print('Błąd zapisywania wyników: $e');
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -106,6 +157,74 @@ class _TestState extends State<Test> with SingleTickerProviderStateMixin {
     final screenHeight = MediaQuery.of(context).size.height;
     final double cardWidth = screenWidth > 1100 ? 900 : screenWidth * 0.8;
     final double cardHeight = screenHeight > 600 ? 400 : screenHeight * 0.5;
+
+    // Pokaż ładowanie jeśli dane są pobierane
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFCCF5FC),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Ładowanie fiszek...'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Pokaż komunikat o błędzie jeśli wystąpił
+    if (errorMessage.isNotEmpty) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFCCF5FC),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Colors.red),
+              SizedBox(height: 16),
+              Text(errorMessage),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isLoading = true;
+                    errorMessage = '';
+                  });
+                  _loadFiszki();
+                },
+                child: Text('Spróbuj ponownie'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (fiszki.isEmpty) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFCCF5FC),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.info_outline, size: 48, color: Colors.blue),
+              SizedBox(height: 16),
+              Text('Brak fiszek do nauki. Dodaj najpierw fiszki!'),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Wróć do menu'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final String tekstPl = fiszki[currentIndex]['pl']!;
     final String tekstEn = fiszki[currentIndex]['en']!;

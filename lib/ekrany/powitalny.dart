@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fischer/services/firebase_service.dart';
 
 class Powitalny extends StatefulWidget {
   @override
@@ -8,6 +9,7 @@ class Powitalny extends StatefulWidget {
 
 class _PowitalnyState extends State<Powitalny> {
   bool _isFirebaseConnected = false;
+  final FirebaseService _firebaseService = FirebaseService();
 
   @override
   void initState() {
@@ -29,18 +31,33 @@ class _PowitalnyState extends State<Powitalny> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Ekran Powitalny'),
-      ),
+      backgroundColor: const Color(0xFFCCF5FC),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Logo and title
+            Image.asset(
+              'images/logoFischer.jpg',
+              height: 120,
+            ),
+            SizedBox(height: 30),
             Text(
               'Witaj w aplikacji Fischer!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
+            Text(
+              'Twoja aplikacja do nauki języków z fiszkami',
+              style: TextStyle(
+                fontSize: 16,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            SizedBox(height: 40),
 
             // Status Firebase
             Container(
@@ -64,13 +81,56 @@ class _PowitalnyState extends State<Powitalny> {
               ),
             ),
 
-            SizedBox(height: 40),
+            SizedBox(height: 60),
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/glowny');
-              },
-              child: Text('Przejdź dalej'),
+            // Buttons
+            SizedBox(
+              width: 250,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/login');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF80DEEA),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Zaloguj się / Zarejestruj',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            SizedBox(
+              width: 250,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/glowny');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Color(0xFF80DEEA), width: 2),
+                  ),
+                ),
+                child: Text(
+                  'Kontynuuj bez logowania',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
