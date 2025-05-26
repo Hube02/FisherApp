@@ -1,0 +1,2 @@
+C:/Users/Bartula/StudioProjects/fischerrr/android/app/.cxx/Debug/x5nx2m73/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Bartula/StudioProjects/fischerrr/android/app/.cxx/Debug/x5nx2m73/x86_64/CMakeFiles/rebuild_cache.dir
