@@ -241,28 +241,66 @@ class FirebaseService {
       return {
         'liczbaTestow': 0,
         'sredniaWynikow': 0,
-        'najlepszyWynik': 0,
       };
     }
 
     int liczbaTestow = wyniki.docs.length;
     int sumaWynikow = 0;
-    int najlepszyWynik = 0;
 
     for (var doc in wyniki.docs) {
       final data = doc.data() as Map<String, dynamic>;
       final procent = data['procent'] as int;
       sumaWynikow += procent;
-
-      if (procent > najlepszyWynik) {
-        najlepszyWynik = procent;
-      }
     }
 
     return {
       'liczbaTestow': liczbaTestow,
       'sredniaWynikow': (sumaWynikow / liczbaTestow).round(),
-      'najlepszyWynik': najlepszyWynik,
+    };
+  }
+
+  Future<Map<String, dynamic>> getStatystykiZDnia(DateTime dataDoSprawdzenia) async {
+    QuerySnapshot wyniki;
+
+    if (_currentUserId != null) {
+      wyniki = await _db
+          .collection('users')
+          .doc(_currentUserId)
+          .collection('wyniki')
+          .get();
+    } else {
+      wyniki = await _db.collection('wyniki').get();
+    }
+
+    if (wyniki.docs.isEmpty) {
+      return {
+        'liczbaTestowDzienna': 0,
+        'poprawneDzienne': 0,
+        'niepoprawneDzienne': 0,
+      };
+    }
+
+    int liczbaTestowDzienna = 0;
+    int poprawneDzienne = 0;
+    int niepoprawneDzienne = 0;
+
+    for (var doc in wyniki.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final date = (data['timestamp'] as Timestamp).toDate();
+      final properDate = new DateTime(date.year, date.month, date.day);
+      final properDataDoSprawdzenia = new DateTime(dataDoSprawdzenia.year, dataDoSprawdzenia.month, dataDoSprawdzenia.day);
+      if (0 == properDate.compareTo(properDataDoSprawdzenia))
+      {
+        liczbaTestowDzienna++;
+        poprawneDzienne = poprawneDzienne + (data['poprawne'] as int);
+        niepoprawneDzienne = niepoprawneDzienne + ((data['wszystkie'] as int) - (data['poprawne'] as int));
+      }
+    }
+
+    return {
+      'liczbaTestowDzienna': liczbaTestowDzienna,
+      'poprawneDzienne': poprawneDzienne,
+      'niepoprawneDzienne': niepoprawneDzienne,
     };
   }
 

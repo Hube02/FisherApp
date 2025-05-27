@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fischer/services/firebase_service.dart';
 
 class Powitalny extends StatefulWidget {
   @override
@@ -9,7 +8,6 @@ class Powitalny extends StatefulWidget {
 
 class _PowitalnyState extends State<Powitalny> {
   bool _isFirebaseConnected = false;
-  final FirebaseService _firebaseService = FirebaseService();
 
   @override
   void initState() {
