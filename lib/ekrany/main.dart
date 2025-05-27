@@ -8,14 +8,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fischer/services/firebase_service.dart';
 
 void main() async {
-  // Inicjalizacja Flutter i Firebase
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
     await Firebase.initializeApp();
     print('Firebase zainicjalizowany pomyślnie');
 
-    // Initialize auth state
     await FirebaseService().initAuthState();
   } catch (e) {
     print('Błąd inicjalizacji Firebase: $e');

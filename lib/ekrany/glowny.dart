@@ -277,7 +277,7 @@ class _GlownyState extends State<Glowny> {
                 Image.asset('images/logoFischer.jpg', height: 50),
                 Padding(
                   padding:
-                      const EdgeInsets.only(top: 8.0), // 👈 obniża przycisk
+                      const EdgeInsets.only(top: 8.0),
                   child: TextButton.icon(
                     icon: Icon(Icons.exit_to_app),
                     label: Text(isUserLoggedIn ? 'Wyloguj' : 'Wróć'),
@@ -329,7 +329,6 @@ class _GlownyState extends State<Glowny> {
                       "Zobacz jak robisz postępy", Colors.yellow, onTap: () {
                     Navigator.pushNamed(context, '/statystyki');
 
-                    // przyszłe statystyki
                   }),
                   _buildGridButton(
                       context,

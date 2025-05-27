@@ -173,7 +173,7 @@ class _TestState extends State<Test> with SingleTickerProviderStateMixin {
 
     String cleaned = input
         .toLowerCase()
-        .replaceAll(RegExp("[.,!?\"'`]"), '') // 👈 brak `r""`
+        .replaceAll(RegExp("[.,!?\"'`]"), '')
         .trim();
 
     replacements.forEach((short, full) {

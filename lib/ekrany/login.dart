@@ -13,7 +13,7 @@ class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _isLogin = true; // Toggle between login and register
+  bool _isLogin = true;
   bool _isLoading = false;
   String _errorMessage = '';
 
@@ -35,13 +35,11 @@ class _LoginState extends State<Login> {
         bool success;
 
         if (_isLogin) {
-          // Login
           success = await _firebaseService.signInWithEmailAndPassword(
             _emailController.text.trim(),
             _passwordController.text.trim(),
           );
         } else {
-          // Register
           success = await _firebaseService.registerWithEmailAndPassword(
             _emailController.text.trim(),
             _passwordController.text.trim(),
@@ -49,7 +47,6 @@ class _LoginState extends State<Login> {
         }
 
         if (success) {
-          // Navigate to main screen on success
           Navigator.pushReplacementNamed(context, '/glowny');
         } else {
           setState(() {
@@ -112,12 +109,10 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 30),
 
-                  // Form
                   Form(
                     key: _formKey,
                     child: Column(
                       children: [
-                        // Email field
                         TextFormField(
                           controller: _emailController,
                           decoration: InputDecoration(
@@ -139,7 +134,6 @@ class _LoginState extends State<Login> {
                         ),
                         SizedBox(height: 20),
 
-                        // Password field
                         TextFormField(
                           controller: _passwordController,
                           decoration: InputDecoration(
@@ -162,7 +156,6 @@ class _LoginState extends State<Login> {
                         ),
                         SizedBox(height: 10),
 
-                        // Error message
                         if (_errorMessage.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -177,7 +170,6 @@ class _LoginState extends State<Login> {
 
                         SizedBox(height: 20),
 
-                        // Submit button
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -203,7 +195,6 @@ class _LoginState extends State<Login> {
                         ),
                         SizedBox(height: 20),
 
-                        // Toggle button
                         TextButton(
                           onPressed: _toggleView,
                           child: Text(

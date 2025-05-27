@@ -15,7 +15,6 @@ class _PowitalnyState extends State<Powitalny> {
     _checkFirebase();
   }
 
-  // Sprawdź czy Firebase działa
   Future<void> _checkFirebase() async {
     try {
       setState(() {
@@ -34,7 +33,6 @@ class _PowitalnyState extends State<Powitalny> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo and title
             Image.asset(
               'images/logoFischer.jpg',
               height: 120,
@@ -57,7 +55,6 @@ class _PowitalnyState extends State<Powitalny> {
             ),
             SizedBox(height: 40),
 
-            // Status Firebase
             Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -81,7 +78,6 @@ class _PowitalnyState extends State<Powitalny> {
 
             SizedBox(height: 60),
 
-            // Buttons
             SizedBox(
               width: 250,
               height: 50,

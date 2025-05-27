@@ -45,7 +45,7 @@ class _PersonalizacjaState extends State<Personalizacja> {
   Future<void> _resetToDefaults() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('fontSize', 16);
-    await prefs.setInt('bgColor', 0xff84f1ff); // kolor gradientu góry
+    await prefs.setInt('bgColor', 0xff84f1ff);
     await prefs.setInt('tileColor', Colors.cyan.value);
     await prefs.setInt('cardColor', Colors.white.value);
     await prefs.setInt('cardTextColor', Colors.black.value);
