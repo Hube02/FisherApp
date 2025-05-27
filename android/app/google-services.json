@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "283490008706",
+    "project_id": "fischer-1e028",
+    "storage_bucket": "fischer-1e028.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:283490008706:android:35e53e25d6d9f5c1cebe9b",
+        "android_client_info": {
+          "package_name": "com.example.fischer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCePwRJYxK7zzQeTGCjRCTtzkekVn4NhrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
