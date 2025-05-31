@@ -34,6 +34,7 @@ class _StatystykiState extends State<Statystyki> {
     super.initState();
     _loadPrefs();
     _loadStats();
+    _onDateChanged(_todayDate);
   }
 
   Future<void> _loadPrefs() async {
@@ -55,6 +56,7 @@ class _StatystykiState extends State<Statystyki> {
       _liczbaTestowDzienna = statystykiZDnia['liczbaTestowDzienna'];
     });
   }
+
   Future<void> _loadStats() async {
     setState(() => _isLoading = true);
 
@@ -69,22 +71,27 @@ class _StatystykiState extends State<Statystyki> {
       _sredniaWynikow = statystyki['sredniaWynikow'];
       _isLoading = false;
     });
-  
-}
+  }
+
+  Future<void> _refreshButton() async {
+    _loadStats();
+    _onDateChanged(_todayDate);
+  }
 
   Timer? _debounce;
 
   _onDateChanged(DateTime date) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-        _loadDayStats(date);
-  });
-}
-@override
-void dispose() {
+      _loadDayStats(date);
+    });
+  }
+
+  @override
+  void dispose() {
     _debounce?.cancel();
     super.dispose();
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,9 +165,8 @@ void dispose() {
                       height: 40,
                     ),
                     Text(
-                          "Wybierz dzień",
-                          style: TextStyle(
-                              fontSize: 24, color: _cardTextColor),
+                      "Wybierz dzień",
+                      style: TextStyle(fontSize: 24, color: _cardTextColor),
                     ),
                     SizedBox(
                       height: 40,
@@ -225,7 +231,7 @@ void dispose() {
                     ),
                     const SizedBox(height: 30),
                     ElevatedButton(
-                      onPressed: _loadStats,
+                      onPressed: _refreshButton,
                       child: const Text('Odśwież statystyki'),
                     ),
                   ],

@@ -11,7 +11,6 @@ class Personalizacja extends StatefulWidget {
 class _PersonalizacjaState extends State<Personalizacja> {
   double _fontSize = 16;
   Color _bgColor = Colors.lightBlue.shade50;
-  Color _tileColor = Colors.cyan;
   Color _cardColor = Colors.white;
   Color _cardTextColor = Colors.black;
 
@@ -26,7 +25,6 @@ class _PersonalizacjaState extends State<Personalizacja> {
     setState(() {
       _fontSize = (prefs.getDouble('fontSize') ?? 16).clamp(12, 25);
       _bgColor = Color(prefs.getInt('bgColor') ?? 0xff84f1ff);
-      _tileColor = Color(prefs.getInt('tileColor') ?? Colors.cyan.value);
       _cardColor = Color(prefs.getInt('cardColor') ?? Colors.white.value);
       _cardTextColor =
           Color(prefs.getInt('cardTextColor') ?? Colors.black.value);
@@ -37,7 +35,6 @@ class _PersonalizacjaState extends State<Personalizacja> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('fontSize', _fontSize);
     await prefs.setInt('bgColor', _bgColor.value);
-    await prefs.setInt('tileColor', _tileColor.value);
     await prefs.setInt('cardColor', _cardColor.value);
     await prefs.setInt('cardTextColor', _cardTextColor.value);
   }
@@ -46,7 +43,6 @@ class _PersonalizacjaState extends State<Personalizacja> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('fontSize', 16);
     await prefs.setInt('bgColor', 0xff84f1ff);
-    await prefs.setInt('tileColor', Colors.cyan.value);
     await prefs.setInt('cardColor', Colors.white.value);
     await prefs.setInt('cardTextColor', Colors.black.value);
     _loadPrefs();
@@ -89,8 +85,6 @@ class _PersonalizacjaState extends State<Personalizacja> {
                       SizedBox(height: 20),
                       _buildColorPicker('Kolor tła aplikacji', _bgColor,
                           (color) => _bgColor = color),
-                      _buildColorPicker('Kolor kafelków', _tileColor,
-                          (color) => _tileColor = color),
                       _buildColorPicker('Kolor fiszki', _cardColor,
                           (color) => _cardColor = color),
                       _buildColorPicker('Kolor tekstu fiszki', _cardTextColor,
@@ -125,6 +119,19 @@ class _PersonalizacjaState extends State<Personalizacja> {
 
   Widget _buildColorPicker(
       String title, Color currentColor, Function(Color) onColorPicked) {
+    final List<Color> gentleColors = [
+      Color(0xFF4FC3F7), // Light Blue
+      Color(0xFFF06292), // Pink
+      Color(0xFF81C784), // Green
+      Color(0xFFFFD54F), // Amber
+      Color(0xFF9575CD), // Deep Purple
+      Color(0xFF4DB6AC), // Teal
+      Color(0xFFFFA726), // Orange
+      Color(0xFF7986CB), // Indigo
+      Color(0xFF4DD0E1), // Cyan
+      Color(0xFFDCE775), // Lime
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -132,7 +139,7 @@ class _PersonalizacjaState extends State<Personalizacja> {
         SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: Colors.primaries.take(10).map((color) {
+          children: gentleColors.map((color) {
             return GestureDetector(
               onTap: () => setState(() => onColorPicked(color)),
               child: Container(
